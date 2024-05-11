@@ -10,29 +10,23 @@ from django.contrib.auth.decorators import login_required
 
 @login_required
 def solicitud_list(request):
-    role,email= getRole(request)
-    solicitudes = get_solicitudes()
-    solicitudes_aux=[]
-    for solicitud in solicitudes:
-           if not verificar_hash(solicitud):
-              modificar_sol_mod(solicitud)
-           if role == "user":
-             if solicitud.cliente == email:  
-                solicitudes_aux.append(solicitud)
-           else: 
-              solicitudes_aux.append(solicitud)
-           
-    solicitudes= solicitudes_aux
-            
-    context={'solicitudesList':solicitudes}    
-    return render(request, 'solicitudes/solicitudes.html',context)
+    role = getRole(request)
+    if role == 'admin':
+       solicitudes = get_solicitudes()
+       context = {
+           'solicitudes_list': solicitudes
+       }
+       return render(request, 'solicitudes/solicitudes.html', context)
+    else:
+        return HttpResponse('No tienes permisos para ver esta página')
+    
 
 @login_required
 def solicitud_update(request,solicitud_id):
    solicitud= get_solicitud(solicitud_id)
    role,email= getRole(request)
     
-   if role == "user" and solicitud.cliente == email:
+   if role == "admin":
     if request.method == 'POST':
         form= SolicitudForm(request.POST, instance=solicitud)
         if form.is_valid():
@@ -51,25 +45,24 @@ def solicitud_update(request,solicitud_id):
      return HttpResponse("Unauthorized User")   
    
 
-@login_required
 def solicitud_create(request):
-    role,email= getRole(request)
-    if role== "user":
+    role, email = getRole(request)
+    
+    if role in ["admin", "user"]:  # Se corrigió la condición para verificar si el rol es admin o user
         if request.method == 'POST':
             form = SolicitudForm(request.POST)
             if form.is_valid():
-                create_solicitud(form,email)
-                messages.add_message(request, messages.SUCCESS, 'Successfully created solicitud')
+                create_solicitud(form, email)
+                messages.success(request, 'Solicitud created successfully')  # Se corrigió el mensaje de éxito
                 return HttpResponseRedirect(reverse('solicitudesCreate'))
             else:
                 print(form.errors)
         else:
-        
-         form = SolicitudForm()
+            form = SolicitudForm()
 
         context = {
             'form': form,
         }
         return render(request, 'solicitudes/create_solicitud.html', context)
     else:
-        return HttpResponse("Unauthorized User") 
+        return HttpResponse("Unauthorized User")
