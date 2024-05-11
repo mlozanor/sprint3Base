@@ -10,15 +10,16 @@ from django.contrib.auth.decorators import login_required
 
 @login_required
 def solicitud_list(request):
-    role = getRole(request)
-    if role == 'admin':
-       solicitudes = get_solicitudes()
-       context = {
-           'solicitudes_list': solicitudes
-       }
-       return render(request, 'solicitudes/solicitudes.html', context)
-    else:
-        return HttpResponse('No tienes permisos para ver esta página')
+    role,email= getRole(request)
+    solicitudes = get_solicitudes()
+    solicitudes_aux=[]
+    for solicitud in solicitudes:
+        solicitudes_aux.append(solicitud)  
+    solicitudes= solicitudes_aux
+            
+    context={'solicitudesList':solicitudes}    
+    return render(request, 'solicitudes/solicitudes.html',context)
+
     
 
 @login_required
