@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .logic.solicitudes_logic import get_solicitudes ,create_solicitud, get_solicitud,modificar_sol_mod ,verificar_hash
+from .logic.solicitudes_logic import get_solicitudes ,create_solicitud, get_solicitud,modificar_sol_mod ,verificar_ha>
 from .forms import SolicitudForm
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
@@ -16,11 +16,10 @@ def solicitud_list(request):
     for solicitud in solicitudes:
         solicitudes_aux.append(solicitud)  
     solicitudes= solicitudes_aux
-            
+
     context={'solicitudesList':solicitudes}    
     return render(request, 'solicitudes/solicitudes.html',context)
 
-    
 
 @login_required
 def solicitud_update(request,solicitud_id):
@@ -44,7 +43,6 @@ def solicitud_update(request,solicitud_id):
     return render(request,'solicitudes/update_solicitud.html',context)
    else:
      return HttpResponse("Unauthorized User")   
-   
 
 def solicitud_create(request):
     role, email = getRole(request)
@@ -67,3 +65,4 @@ def solicitud_create(request):
         return render(request, 'solicitudes/create_solicitud.html', context)
     else:
         return HttpResponse("Unauthorized User")
+   
